@@ -1,0 +1,9 @@
+backend/.venv
+backend/__pycache__
+frontend/speaky-doc-app/node_modules
+frontend/speaky-doc-app/.svelte-kit
+frontend/package-lock.json
+.git
+.vscode
+.DS_Store
+*.pyc
