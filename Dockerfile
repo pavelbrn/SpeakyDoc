@@ -16,6 +16,7 @@ COPY . .
 WORKDIR /app/frontend/speaky-doc-app
 RUN npm install
 RUN npm run build
+RUN apt-get update && apt-get install -y ffmpeg
 
 # Install backend deps
 WORKDIR /app/backend
