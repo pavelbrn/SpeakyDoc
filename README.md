@@ -1,6 +1,11 @@
 # SpeakyDoc
 
-SpeakyDoc is a small full-stack demo that uploads an audio file, sends it to a Flask backend, and returns structured JSON in a SvelteKit web app.
+SpeakyDoc is a small full-stack app that uploads an audio file, sends it to a Flask backend, and returns structured JSON in a SvelteKit web app. The AI will only accept medical history notes and will reject any other types of transcripts.
+
+Clone this project:
+```
+git clone git@github.com:pavelbrn/SpeakyDoc.git
+```
 
 ## Stack
 
@@ -15,14 +20,16 @@ From the project root:
 
 Build the container:
 ```bash
+cd SpeakyDoc
 docker build -t speakydoc .
 ```
 
-Set the Whisper model name inside the Dockerfi, the default model is "small" :
-- Build time (model preload into the image): `--build-arg WHISPER_PRELOAD_MODEL=...`
+If you want to switch the Whisper model, then set a new name inside the Dockerfile, the default model is "small" :
+- Look for this variable inside the Dockerfile 
+` WHISPER_PRELOAD_MODEL=...`
 
 
-Larger models (`medium`, `large-v3`) will make the container build take much longer and produce a bigger image and will take longer to process a .wav file during run time, but the quality of the transcription and LLM summary will be better.
+Larger models (`medium`, `large-v3`) will make the container build take much longer and produce a bigger image. This will take longer to process a .wav file during run time, but the quality of the transcription and LLM summary will be better.
 
 Run the project with your OpenAI API key and Whisper model:
 ```bash
