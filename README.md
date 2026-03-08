@@ -13,17 +13,20 @@ SpeakyDoc is a small full-stack demo that uploads an audio file, sends it to a F
 
 From the project root:
 
-create the container
+Build the container:
 ```bash
-docker build --platform linux/amd64 -t speakydoc .
+docker build -t speakydoc .
 ```
 
-Run the project with your OpenAI API key
+Run the project with your OpenAI API key and Whisper model:
 ```bash
 docker run -p 4173:4173 -p 8000:8000 \
 -e OPENAI_API_KEY="sk-xxxxx" \
+-e WHISPER_MODEL="base" \
 speakydoc
 ```
+
+Example Whisper models: `base`, `small`, `medium`, `large-v3`.
 
 Open:
 
@@ -84,7 +87,4 @@ s
 ## Notes
 
 This project is designed to run locally via Docker.
-
-
-
 

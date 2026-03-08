@@ -21,6 +21,7 @@
 
 	/** @param {File | null} file */
 	function isWav(file) {
+		// Accept both MIME-based and extension-based WAV detection for browser compatibility.
 		if (!file) return false;
 		const type = (file.type || '').toLowerCase();
 		const name = (file.name || '').toLowerCase();
@@ -56,6 +57,7 @@
 	 * @param {string} sourceLabel
 	 */
 	async function submitFile(file, sourceLabel) {
+		// Single upload path used by both picked files and recorded audio.
 		isSubmitting = true;
 		errorMessage = '';
 		result = null;
@@ -74,6 +76,7 @@
 			/** @type {any} */
 			let payload;
 			try {
+				// Handle non-JSON backend failures with a clear UI error.
 				payload = rawResponse ? JSON.parse(rawResponse) : {};
 			} catch {
 				throw new Error(
@@ -108,6 +111,7 @@
 
 	/** @param {AudioBuffer} audioBuffer */
 	function audioBufferToWav(audioBuffer) {
+		// Encode PCM samples into a WAV container so backend receives a real .wav file.
 		const channels = audioBuffer.numberOfChannels;
 		const sampleRate = audioBuffer.sampleRate;
 		const length = audioBuffer.length;
@@ -170,6 +174,7 @@
 
 	/** @param {Blob} blob */
 	async function convertBlobToWav(blob) {
+		// Recorders often emit WebM/Opus; convert to WAV before upload.
 		const arrayBuffer = await blob.arrayBuffer();
 		const AudioContextCtor = window.AudioContext || /** @type {any} */ (window).webkitAudioContext;
 		const audioContext = new AudioContextCtor();
@@ -184,6 +189,7 @@
 	}
 
 	async function startRecording() {
+		// Start microphone capture and collect chunks until stop.
 		errorMessage = '';
 		result = null;
 
@@ -239,6 +245,7 @@
 			const wavBlob = await convertBlobToWav(rawBlob);
 			const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
 			const wavFile = new File([wavBlob], `recording-${timestamp}.wav`, { type: 'audio/wav' });
+			// Reuse the same submit flow used for uploaded files.
 			selectedFile = wavFile;
 			await submitFile(wavFile, 'recording');
 		} catch (error) {

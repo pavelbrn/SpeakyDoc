@@ -1,8 +1,12 @@
 from faster_whisper import WhisperModel
+import os
 
+
+# Model can be overridden at container runtime, defaults to the previous stable setup.
+WHISPER_MODEL = os.getenv("WHISPER_MODEL", "base")
 
 model = WhisperModel(
-    "base",
+    WHISPER_MODEL,
     device="cpu",
     compute_type="int8"
 )
@@ -23,7 +27,7 @@ def transcribe_wav_file(file_path: str) -> str:
         language="de"
     )
 
-    print(f"[INFO] detected language: {info.language}")
+    print(f"[INFO] model={WHISPER_MODEL}, detected_language={info.language}")
 
     transcript_parts = []
 
