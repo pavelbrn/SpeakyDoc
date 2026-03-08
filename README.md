@@ -68,7 +68,7 @@ uv run python -m app.main
 
 Runs on http://localhost:8000
 
-WARNING: never commit API keys. Never add `.env` files containing secrets to a container
+WARNING: never commit API keys. Never add `.env` files containing secrets to a container.
 
 ### Frontend
 
@@ -81,14 +81,14 @@ npm run dev
 Runs on http://localhost:5173
 
 ## SpeakyDoc UI
-- Click on "Select Wav" and select your .wav file
-- Click on "Start Transcription" after selecting the .wav
+- Click on "Select Wav" and select your .wav file.
+- Click on "Start Transcription" after selecting the .wav.
 
 - Alternatively you can also dictate your own doctors notes. Please have your microphone ready.
 - The WebApp is phone friendly! So you can record using you phones microphone.
 ![SpeakyDoc Screenshot](docs/images/SpeakyDoc.png)
 
-- You can also preview the structured JSON output
+- You can also preview the structured JSON output.
 ![SpeakyDoc Screenshot](docs/images/SpeakyDoc2.png)
 ## Notes
 
