@@ -5,6 +5,14 @@ from openai import OpenAI
 
 
 def _get_openai_client() -> OpenAI:
+    """Create an OpenAI client from environment configuration.
+
+    Returns:
+        OpenAI: Configured OpenAI API client instance.
+
+    Raises:
+        RuntimeError: If `OPENAI_API_KEY` is not set.
+    """
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY is not set")
@@ -12,6 +20,19 @@ def _get_openai_client() -> OpenAI:
 
 
 def _parse_json_output(content: str) -> dict:
+    """Parse model output into a JSON dictionary.
+
+    This helper strips optional fenced code block markers before parsing.
+
+    Args:
+        content: Raw text returned by the LLM.
+
+    Returns:
+        dict: Parsed JSON object.
+
+    Raises:
+        json.JSONDecodeError: If the cleaned content is not valid JSON.
+    """
     cleaned = content.strip()
     if cleaned.startswith("```"):
         cleaned = cleaned.strip("`")
@@ -21,6 +42,14 @@ def _parse_json_output(content: str) -> dict:
 
 
 def check_if_medical_text(transcript: str) -> dict:
+    """Classify whether a transcript contains medical documentation text.
+
+    Args:
+        transcript: Raw transcript text to classify.
+
+    Returns:
+        dict: Classification payload with keys `is_medical_text` and `message`.
+    """
     client = _get_openai_client()
 
     prompt = f"""
@@ -60,6 +89,16 @@ Transcript:
 
 
 def structure_medical_text(transcript: str) -> dict:
+    """Extract structured medical fields from a German transcript.
+
+    Args:
+        transcript: Raw German transcript from speech-to-text.
+
+    Returns:
+        dict: Normalized JSON object with keys:
+            `aktuelle_anamnese`, `vorerkrankungen`, `voroperationen`,
+            and `medikation`.
+    """
     client = _get_openai_client()
 
     prompt = f"""
@@ -126,6 +165,14 @@ Transcript:
     parsed = _parse_json_output(content)
 
     def to_list(value) -> list[str]:
+        """Normalize arbitrary values into a clean list of strings.
+
+        Args:
+            value: Candidate list-like value returned by the LLM.
+
+        Returns:
+            list[str]: Trimmed non-empty string items, or an empty list.
+        """
         if isinstance(value, list):
             return [str(item).strip() for item in value if str(item).strip()]
         return []

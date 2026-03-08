@@ -25,11 +25,27 @@ os.makedirs(RECORDINGS_DIR, exist_ok=True)
 
 @app.route("/api/health")
 def health():
+    """Return a basic health-check status for the API.
+
+    Returns:
+        dict: A JSON-serializable status payload.
+    """
     return {"status": "ok"}
 
 
 @app.route("/api/process", methods=["POST"])
 def process():
+    """Process an uploaded audio file and return extracted medical information.
+
+    The endpoint validates the multipart payload, stores the uploaded file,
+    transcribes it with Whisper, checks whether the transcript is medical, and
+    optionally returns structured medical fields.
+
+    Returns:
+        flask.Response | tuple[flask.Response, int]:
+            JSON response containing transcription and extraction results.
+            Returns HTTP 400 for invalid input and HTTP 500 on unexpected errors.
+    """
     try:
         if "audio" not in request.files:
             return {"error": "no audio uploaded"}, 400
