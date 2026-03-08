@@ -1,6 +1,7 @@
 FROM node:22-bookworm
 
 WORKDIR /app
+ARG WHISPER_PRELOAD_MODEL=medium
 
 # Install system dependencies once (including ffmpeg for audio decoding).
 RUN apt-get update && apt-get install -y python3 python3-venv python3-pip curl ffmpeg && rm -rf /var/lib/apt/lists/*
@@ -20,6 +21,8 @@ RUN npm run build
 # Install backend deps
 WORKDIR /app/backend
 RUN uv sync
+ENV WHISPER_MODEL=${WHISPER_PRELOAD_MODEL}
+RUN uv run python -c "from faster_whisper import WhisperModel; WhisperModel('${WHISPER_PRELOAD_MODEL}', device='cpu', compute_type='int8'); print('Preloaded model:', '${WHISPER_PRELOAD_MODEL}')"
 
 EXPOSE 4173
 EXPOSE 8000

@@ -15,18 +15,37 @@ From the project root:
 
 Build the container:
 ```bash
-docker build -t speakydoc .
+docker build --platform linux/amd64 -t speakydoc .
 ```
+
+Set the Whisper model name in two places:
+- Build time (model preload into the image): `--build-arg WHISPER_PRELOAD_MODEL=...`
+- Run time (model used by backend): `-e WHISPER_MODEL=...`
+
+Preload a specific Whisper model into the image at build time:
+```bash
+docker build --build-arg WHISPER_PRELOAD_MODEL=medium -t speakydoc .
+```
+
+Larger models (`medium`, `large-v3`) will make the container build take much longer and produce a bigger image and will take longer to process a .wav file during run time, but the quality of the transcription and LLM summary will be better.
 
 Run the project with your OpenAI API key and Whisper model:
 ```bash
 docker run -p 4173:4173 -p 8000:8000 \
 -e OPENAI_API_KEY="sk-xxxxx" \
--e WHISPER_MODEL="base" \
 speakydoc
 ```
 
 Example Whisper models: `base`, `small`, `medium`, `large-v3`.
+
+Full example (matching build + run):
+```bash
+docker build --build-arg WHISPER_PRELOAD_MODEL=small -t speakydoc .
+docker run -p 4173:4173 -p 8000:8000 \
+  -e OPENAI_API_KEY="sk-xxxxx" \
+  -e WHISPER_MODEL="small" \
+  speakydoc
+```
 
 Open:
 
