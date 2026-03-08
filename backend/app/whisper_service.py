@@ -1,16 +1,10 @@
 from faster_whisper import WhisperModel
-import os
 
-
-# Quality-first defaults (override via env vars).
-WHISPER_MODEL = os.getenv("WHISPER_MODEL", "large-v3")
-WHISPER_DEVICE = os.getenv("WHISPER_DEVICE", "cpu")
-WHISPER_COMPUTE_TYPE = os.getenv("WHISPER_COMPUTE_TYPE", "int8")
 
 model = WhisperModel(
-    WHISPER_MODEL,
-    device=WHISPER_DEVICE,
-    compute_type=WHISPER_COMPUTE_TYPE
+    "base",
+    device="cpu",
+    compute_type="int8"
 )
 
 
@@ -26,17 +20,10 @@ def transcribe_wav_file(file_path: str) -> str:
 
     segments, info = model.transcribe(
         file_path,
-        language="de",
-        beam_size=5,
-        best_of=5,
-        temperature=0.0,
-        vad_filter=True
+        language="de"
     )
 
-    print(
-        f"[INFO] model={WHISPER_MODEL}, detected_language={info.language}, "
-        f"device={WHISPER_DEVICE}, compute_type={WHISPER_COMPUTE_TYPE}"
-    )
+    print(f"[INFO] detected language: {info.language}")
 
     transcript_parts = []
 
