@@ -83,7 +83,7 @@ Runs on http://localhost:5173
 ## SpeakyDoc UI
 - Click on "Select Wav" and select your .wav file
 - Click on "Start Transcription" after selecting the .wav
-- 
+
 - Alternatively you can also dictate your own doctors notes. Please have your microphone ready.
 - The WebApp is phone friendly! So you can record using you phones microphone.
 ![SpeakyDoc Screenshot](docs/images/SpeakyDoc.png)
