@@ -63,7 +63,7 @@
 		isSubmitting = true;
 		errorMessage = '';
 		result = null;
-		statusMessage = `Uploading ${sourceLabel}...`;
+		statusMessage = `Processing ${sourceLabel}...`;
 
 		try {
 			const formData = new FormData();
@@ -288,7 +288,7 @@
 				Select WAV
 			</button>
 			<button class="button primary" type="button" on:click={uploadSelectedFile} disabled={isSubmitting || !selectedFile || isRecording}>
-				Upload File
+				Start Transcription
 			</button>
 			<button class="button" type="button" on:click={startRecording} disabled={isSubmitting || isRecording}>
 				Start Recording

@@ -47,6 +47,7 @@ Run backend locally with `uv` (outside Docker):
 cd backend
 uv sync
 export OPENAI_API_KEY="sk-xxxxx"
+export WHISPER_MODEL="small"
 uv run python -m app.main
 ```
 
@@ -78,24 +79,14 @@ Example response:
 }
 ```
 
-### Process endpoint
 
-POST /api/process
+## SpeakyDoc UI
+- Click on "Select Wav" and select your .wav file
+- Click on "Start Transcription" after selecting the .wav
+- Alternatively you can also dictate your own doctors notes. Please have your microphone ready.
 
-Current example response:
-TODO: finish this, this is a placeholder for now
-s
-```json
-{
-  "patient_name": "PATIENT_NAME",
-  "chief_complaint": "Brustschmerzen seit 2 Tagen",
-  "assessment": "Verdacht auf Angina pectoris"
-}
-```
-
-## The result
 ![SpeakyDoc Screenshot](docs/images/SpeakyDoc.png)
 
 ## Notes
 
-This project is designed to run locally via Docker.
+This project is designed to run locally via Docker. We can expand this project to use local models via ollama or Hugginface.

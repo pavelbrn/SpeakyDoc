@@ -3,7 +3,7 @@ import os
 
 
 # Model can be overridden at container runtime, defaults to the previous stable setup.
-WHISPER_MODEL = os.getenv("WHISPER_MODEL", "base")
+WHISPER_MODEL = os.getenv("WHISPER_MODEL", "small")
 LOADED_WHISPER_MODEL = WHISPER_MODEL
 
 try:
@@ -15,11 +15,11 @@ try:
 except Exception as exc:
     print(
         f"[WARN] Failed to load WHISPER_MODEL='{WHISPER_MODEL}'. "
-        f"Falling back to 'base'. Error: {exc}"
+        f"Falling back to 'small'. Error: {exc}"
     )
-    LOADED_WHISPER_MODEL = "base"
+    LOADED_WHISPER_MODEL = "small"
     model = WhisperModel(
-        "base",
+        "small",
         device="cpu",
         compute_type="int8"
     )
