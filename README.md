@@ -15,7 +15,7 @@ From the project root:
 
 Build the container:
 ```bash
-docker build --platform linux/amd64 -t speakydoc .
+docker build -t speakydoc .
 ```
 
 Set the Whisper model name in two places:
@@ -56,13 +56,26 @@ Open:
 
 ### Backend
 
+Run backend locally with `uv` (outside Docker):
 ```bash
 cd backend
 uv sync
-uv run python app/main.py
+export OPENAI_API_KEY="sk-xxxxx"
+uv run python -m app.main
 ```
 
 Runs on http://localhost:8000
+
+Optional `.env` flow (outside Docker):
+```bash
+cd backend
+set -a
+source .env
+set +a
+uv run python -m app.main
+```
+
+Security warning: never commit API keys. Never upload `.env` files containing secrets to GitHub.
 
 ### Frontend
 
