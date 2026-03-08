@@ -66,16 +66,7 @@ uv run python -m app.main
 
 Runs on http://localhost:8000
 
-Optional `.env` flow (outside Docker):
-```bash
-cd backend
-set -a
-source .env
-set +a
-uv run python -m app.main
-```
-
-Security warning: never commit API keys. Never upload `.env` files containing secrets to GitHub.
+WARNING: never commit API keys. Never add `.env` files containing secrets to a container
 
 ### Frontend
 
