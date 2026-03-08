@@ -4,12 +4,25 @@ import os
 
 # Model can be overridden at container runtime, defaults to the previous stable setup.
 WHISPER_MODEL = os.getenv("WHISPER_MODEL", "base")
+LOADED_WHISPER_MODEL = WHISPER_MODEL
 
-model = WhisperModel(
-    WHISPER_MODEL,
-    device="cpu",
-    compute_type="int8"
-)
+try:
+    model = WhisperModel(
+        WHISPER_MODEL,
+        device="cpu",
+        compute_type="int8"
+    )
+except Exception as exc:
+    print(
+        f"[WARN] Failed to load WHISPER_MODEL='{WHISPER_MODEL}'. "
+        f"Falling back to 'base'. Error: {exc}"
+    )
+    LOADED_WHISPER_MODEL = "base"
+    model = WhisperModel(
+        "base",
+        device="cpu",
+        compute_type="int8"
+    )
 
 
 def transcribe_wav_file(file_path: str) -> str:
@@ -27,7 +40,7 @@ def transcribe_wav_file(file_path: str) -> str:
         language="de"
     )
 
-    print(f"[INFO] model={WHISPER_MODEL}, detected_language={info.language}")
+    print(f"[INFO] model={LOADED_WHISPER_MODEL}, detected_language={info.language}")
 
     transcript_parts = []
 

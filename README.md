@@ -87,4 +87,3 @@ s
 ## Notes
 
 This project is designed to run locally via Docker.
-

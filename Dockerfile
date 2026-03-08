@@ -2,8 +2,8 @@ FROM node:22-bookworm
 
 WORKDIR /app
 
-# Install Python + curl
-RUN apt-get update && apt-get install -y python3 python3-venv python3-pip curl && rm -rf /var/lib/apt/lists/*
+# Install system dependencies once (including ffmpeg for audio decoding).
+RUN apt-get update && apt-get install -y python3 python3-venv python3-pip curl ffmpeg && rm -rf /var/lib/apt/lists/*
 
 # Install uv
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -16,7 +16,6 @@ COPY . .
 WORKDIR /app/frontend/speaky-doc-app
 RUN npm install
 RUN npm run build
-RUN apt-get update && apt-get install -y ffmpeg
 
 # Install backend deps
 WORKDIR /app/backend
