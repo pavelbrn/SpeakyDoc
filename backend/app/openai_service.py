@@ -65,20 +65,50 @@ def structure_medical_text(transcript: str) -> dict:
     prompt = f"""
 You are a medical documentation assistant.
 
-Extract a structured clinical summary from the following German medical dictation.
+Extract structured data from the following German medical dictation.
 
 Return valid JSON with exactly these keys:
-- patient_complaint
-- findings
-- diagnosis
-- next_steps
+- aktuelle_anamnese
+- vorerkrankungen
+- voroperationen
+- medikation
 
 Rules:
 - Return only JSON
 - Do not invent details
-- If something is missing, return an empty string
 - Keep the content concise
 - Preserve the original language of the transcript
+- `aktuelle_anamnese` must be a string
+- `vorerkrankungen` must be a JSON array of strings
+- `voroperationen` must be a JSON array of strings
+- `medikation` must be a JSON array of strings (current medications only)
+- If no information exists for a list field, return an empty array []
+- If no information exists for `aktuelle_anamnese`, return an empty string
+- If information is uncertain, ambiguous, or not explicitly stated, omit it
+
+Field extraction instructions:
+- `aktuelle_anamnese`:
+  Briefly summarize the current presentation/reason for encounter and relevant current findings.
+  Include current symptoms, event (e.g. fall), and immediate clinical status if mentioned.
+  Do not include chronic history lists or medication lists here.
+- `vorerkrankungen`:
+  List only pre-existing diseases/diagnoses or chronic conditions from past history.
+  Do not include surgeries, current acute event, or medications.
+- `voroperationen`:
+  List only prior operations/procedures from history.
+  Include approximate year/body site if present in transcript text.
+- `medikation`:
+  List only medications the patient currently takes.
+  Prefer one item per medication, optionally with dose/frequency only if explicitly stated.
+  Exclude medications that are merely planned, stopped, denied, or uncertain.
+
+Output format example (must match this shape exactly):
+{{
+  "aktuelle_anamnese": "string",
+  "vorerkrankungen": ["string"],
+  "voroperationen": ["string"],
+  "medikation": ["string"]
+}}
 
 Transcript:
 {transcript}
@@ -93,4 +123,16 @@ Transcript:
     print("[OPENAI RAW OUTPUT]")
     print(content)
 
-    return _parse_json_output(content)
+    parsed = _parse_json_output(content)
+
+    def to_list(value) -> list[str]:
+        if isinstance(value, list):
+            return [str(item).strip() for item in value if str(item).strip()]
+        return []
+
+    return {
+        "aktuelle_anamnese": str(parsed.get("aktuelle_anamnese", "")).strip(),
+        "vorerkrankungen": to_list(parsed.get("vorerkrankungen", [])),
+        "voroperationen": to_list(parsed.get("voroperationen", [])),
+        "medikation": to_list(parsed.get("medikation", [])),
+    }
