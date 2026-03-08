@@ -92,4 +92,4 @@ Runs on http://localhost:5173
 ![SpeakyDoc Screenshot](docs/images/SpeakyDoc2.png)
 ## Notes
 
-This project is designed to run locally via Docker. We can expand this project to use local models via ollama or Hugginface.
+This project is designed to run locally with Docker. We can expand this project to use local models from ollama or Hugginface.
