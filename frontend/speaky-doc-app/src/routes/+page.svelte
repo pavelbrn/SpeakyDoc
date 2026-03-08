@@ -1,5 +1,5 @@
 <script>
-	/** @typedef {{ transcript: string, is_medical_text?: boolean, message?: string, structured_data?: Record<string, string>, saved_file?: string }} ProcessResponse */
+	/** @typedef {{ transcript: string, is_medical_text?: boolean, message?: string, structured_data?: Record<string, string | string[]>, saved_file?: string }} ProcessResponse */
 
 	/** @type {File | null} */
 	let selectedFile = null;
@@ -9,6 +9,8 @@
 	let statusMessage = 'Ready';
 	let isSubmitting = false;
 	let isRecording = false;
+	/** @type {'note' | 'json'} */
+	let activeResultTab = 'note';
 
 	/** @type {HTMLInputElement | undefined} */
 	let fileInput;
@@ -89,6 +91,7 @@
 			}
 
 			result = payload;
+			activeResultTab = 'note';
 			statusMessage = payload.is_medical_text === false
 				? 'Processed: non-medical content'
 				: `${sourceLabel} processed successfully`;
@@ -107,6 +110,12 @@
 		}
 
 		await submitFile(selectedFile, 'file');
+	}
+
+	/** @param {unknown} value */
+	function asList(value) {
+		if (!Array.isArray(value)) return [];
+		return value.map((item) => String(item)).filter(Boolean);
 	}
 
 	/** @param {AudioBuffer} audioBuffer */
@@ -295,6 +304,9 @@
 				<p>Current file: {selectedFile.name}</p>
 			{/if}
 		</div>
+		<p class="model-warning">
+			Whisper note: the most reliable model right now is <strong>base</strong>, and it is also the automatic fallback.
+		</p>
 
 		{#if errorMessage}
 			<p class="error">{errorMessage}</p>
@@ -309,7 +321,76 @@
 					{result.message}
 				</p>
 			{/if}
-			<pre>{JSON.stringify(result, null, 2)}</pre>
+			<div class="result-tabs" role="tablist" aria-label="Result views">
+				<button
+					type="button"
+					class="tab-button"
+					class:tab-active={activeResultTab === 'note'}
+					on:click={() => (activeResultTab = 'note')}
+				>
+					Doctor's Note
+				</button>
+				<button
+					type="button"
+					class="tab-button"
+					class:tab-active={activeResultTab === 'json'}
+					on:click={() => (activeResultTab = 'json')}
+				>
+					Raw JSON
+				</button>
+			</div>
+
+			{#if activeResultTab === 'note'}
+				<div class="note">
+					<p class="note-heading">Klinische Dokumentation</p>
+					<div class="note-grid">
+						<div class="note-field note-field-wide">
+							<p class="note-label">Aktuelle Anamnese</p>
+							<p class="note-value">{result.structured_data?.aktuelle_anamnese || 'Keine Angaben'}</p>
+						</div>
+
+						<div class="note-field">
+							<p class="note-label">Vorerkrankungen</p>
+							<ul class="note-list">
+								{#each asList(result.structured_data?.vorerkrankungen) as item}
+									<li>{item}</li>
+								{:else}
+									<li>Keine Angaben</li>
+								{/each}
+							</ul>
+						</div>
+
+						<div class="note-field">
+							<p class="note-label">Voroperationen</p>
+							<ul class="note-list">
+								{#each asList(result.structured_data?.voroperationen) as item}
+									<li>{item}</li>
+								{:else}
+									<li>Keine Angaben</li>
+								{/each}
+							</ul>
+						</div>
+
+						<div class="note-field note-field-wide">
+							<p class="note-label">Medikation</p>
+							<ul class="note-list">
+								{#each asList(result.structured_data?.medikation) as item}
+									<li>{item}</li>
+								{:else}
+									<li>Keine Angaben</li>
+								{/each}
+							</ul>
+						</div>
+
+						<div class="note-field note-field-wide">
+							<p class="note-label">Transkript (Original)</p>
+							<p class="note-value note-transcript">{result.transcript || 'Kein Transkript verfügbar'}</p>
+						</div>
+					</div>
+				</div>
+			{:else}
+				<pre>{JSON.stringify(result, null, 2)}</pre>
+			{/if}
 		</section>
 	{/if}
 </main>
@@ -431,6 +512,16 @@
 		color: #8a1f1f;
 	}
 
+	.model-warning {
+		margin: 0.7rem 0 0;
+		padding: 0.55rem 0.7rem;
+		border: 1px solid #7a4b0f;
+		background: #f7efe3;
+		color: #7a4b0f;
+		font-size: 0.86rem;
+		line-height: 1.45;
+	}
+
 	.result h2 {
 		margin: 0 0 0.7rem;
 		font-size: 1rem;
@@ -453,12 +544,99 @@
 		color: #7a4b0f;
 	}
 
+	.result-tabs {
+		display: flex;
+		gap: 0.45rem;
+		margin-bottom: 0.8rem;
+		border-bottom: 1px solid #d6d6d1;
+		padding-bottom: 0.65rem;
+	}
+
+	.tab-button {
+		border: 1px solid #111;
+		background: transparent;
+		color: #111;
+		padding: 0.45rem 0.75rem;
+		font-size: 0.78rem;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		cursor: pointer;
+	}
+
+	.tab-active {
+		background: #111;
+		color: #fff;
+	}
+
+	.note {
+		border: 1px solid #d6d6d1;
+		background: #f4f4ef;
+		padding: 0.85rem;
+	}
+
+	.note-heading {
+		margin: 0 0 0.8rem;
+		font-size: 0.78rem;
+		letter-spacing: 0.11em;
+		text-transform: uppercase;
+		color: #575752;
+	}
+
+	.note-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.7rem;
+	}
+
+	.note-field {
+		border: 1px solid #d7d7d2;
+		background: #f9f9f5;
+		padding: 0.7rem;
+	}
+
+	.note-field-wide {
+		grid-column: 1 / -1;
+	}
+
+	.note-label {
+		margin: 0 0 0.45rem;
+		font-size: 0.72rem;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: #5b5b56;
+	}
+
+	.note-value {
+		margin: 0;
+		font-size: 0.92rem;
+		line-height: 1.5;
+		color: #1d1d1a;
+	}
+
+	.note-list {
+		margin: 0;
+		padding-left: 1.1rem;
+		display: grid;
+		gap: 0.28rem;
+		font-size: 0.9rem;
+		line-height: 1.4;
+	}
+
+	.note-transcript {
+		white-space: pre-wrap;
+		word-break: break-word;
+	}
+
 	pre {
 		margin: 0;
 		padding: 0.8rem;
 		border: 1px solid #d6d6d1;
 		background: #f0f0eb;
-		overflow: auto;
+		max-width: 100%;
+		overflow-x: auto;
+		overflow-y: auto;
+		white-space: pre-wrap;
+		word-break: break-word;
 		font-family: 'SF Mono', Menlo, Consolas, monospace;
 		font-size: 0.82rem;
 		line-height: 1.45;
@@ -475,6 +653,10 @@
 
 		.button {
 			width: 100%;
+		}
+
+		.note-grid {
+			grid-template-columns: 1fr;
 		}
 	}
 </style>
