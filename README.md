@@ -93,6 +93,9 @@ s
 }
 ```
 
+## The result
+![SpeakyDoc Screenshot](docs/images/SpeakyDoc.png)
+
 ## Notes
 
 This project is designed to run locally via Docker.
