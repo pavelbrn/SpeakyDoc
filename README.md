@@ -9,7 +9,7 @@ SpeakyDoc is a small full-stack demo that uploads an audio file, sends it to a F
 - Python dependency management with `uv`
 - Single Docker container
 
-## Run with Docker
+## Instructions for running with Docker
 
 From the project root:
 
@@ -38,7 +38,7 @@ Open:
 - Frontend: http://localhost:4173
 - Backend: http://localhost:8000
 
-## Local Development
+## Instructions for Local Development
 
 ### Backend
 
@@ -64,21 +64,6 @@ npm run dev
 ```
 
 Runs on http://localhost:5173
-
-## API
-
-### Health check
-
-GET /api/health
-
-Example response:
-
-```json
-{
-  "status": "ok"
-}
-```
-
 
 ## SpeakyDoc UI
 - Click on "Select Wav" and select your .wav file
