@@ -305,7 +305,7 @@
 			{/if}
 		</div>
 		<p class="model-warning">
-			Whisper note: the fastest model right now is <strong>base</strong>, and it is also the automatic fallback.
+			Whisper note: the fastest model right now is <strong>small</strong>, and it is also the automatic fallback. Use larger models for better transcription quality.
 		</p>
 
 		{#if errorMessage}

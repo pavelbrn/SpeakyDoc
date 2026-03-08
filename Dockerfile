@@ -1,7 +1,7 @@
 FROM node:22-bookworm
 
 WORKDIR /app
-ARG WHISPER_PRELOAD_MODEL=medium
+ARG WHISPER_PRELOAD_MODEL=small
 
 # Install system dependencies once (including ffmpeg for audio decoding).
 RUN apt-get update && apt-get install -y python3 python3-venv python3-pip curl ffmpeg && rm -rf /var/lib/apt/lists/*
