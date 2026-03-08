@@ -1,5 +1,5 @@
 <script>
-	/** @typedef {{ transcript: string, patient_name: string, chief_complaint: string, assessment: string, saved_file?: string }} ProcessResponse */
+	/** @typedef {{ transcript: string, is_medical_text?: boolean, message?: string, structured_data?: Record<string, string>, saved_file?: string }} ProcessResponse */
 
 	/** @type {File | null} */
 	let selectedFile = null;
@@ -70,13 +70,25 @@
 				body: formData
 			});
 
-			const payload = await res.json();
+			const rawResponse = await res.text();
+			/** @type {any} */
+			let payload;
+			try {
+				payload = rawResponse ? JSON.parse(rawResponse) : {};
+			} catch {
+				throw new Error(
+					`Backend returned non-JSON response (${res.status}). ` +
+					`Make sure Flask is running and check backend logs.`
+				);
+			}
 			if (!res.ok) {
 				throw new Error(payload.error || 'Upload failed');
 			}
 
 			result = payload;
-			statusMessage = `${sourceLabel} processed successfully`;
+			statusMessage = payload.is_medical_text === false
+				? 'Processed: non-medical content'
+				: `${sourceLabel} processed successfully`;
 		} catch (error) {
 			errorMessage = error instanceof Error ? error.message : 'Unexpected error';
 			statusMessage = 'Request failed';
@@ -285,6 +297,11 @@
 	{#if result}
 		<section class="panel result">
 			<h2>Processing Result</h2>
+			{#if result.message}
+				<p class="result-message" class:result-warning={result.is_medical_text === false}>
+					{result.message}
+				</p>
+			{/if}
 			<pre>{JSON.stringify(result, null, 2)}</pre>
 		</section>
 	{/if}
@@ -412,6 +429,21 @@
 		font-size: 1rem;
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
+	}
+
+	.result-message {
+		margin: 0 0 0.8rem;
+		padding: 0.55rem 0.7rem;
+		border: 1px solid #1e4e24;
+		background: #ebf4eb;
+		color: #1e4e24;
+		font-size: 0.9rem;
+	}
+
+	.result-warning {
+		border-color: #7a4b0f;
+		background: #f7efe3;
+		color: #7a4b0f;
 	}
 
 	pre {

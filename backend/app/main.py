@@ -12,7 +12,7 @@ if str(BACKEND_ROOT) not in sys.path:
     sys.path.insert(0, str(BACKEND_ROOT))
 
 from app.whisper_service import transcribe_wav_file
-from app.openai_service import structure_medical_text
+from app.openai_service import structure_medical_text, check_if_medical_text
 
 app = Flask(__name__)
 CORS(app)
@@ -30,33 +30,55 @@ def health():
 
 @app.route("/api/process", methods=["POST"])
 def process():
-    if "audio" not in request.files:
-        return {"error": "no audio uploaded"}, 400
+    try:
+        if "audio" not in request.files:
+            return {"error": "no audio uploaded"}, 400
 
-    audio_file = request.files["audio"]
-    safe_name = secure_filename(audio_file.filename or "audio.wav")
+        audio_file = request.files["audio"]
+        safe_name = secure_filename(audio_file.filename or "audio.wav")
 
-    if "." not in safe_name:
-        safe_name = f"{safe_name}.wav"
+        if "." not in safe_name:
+            safe_name = f"{safe_name}.wav"
 
-    timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S_%f")
-    filename = f"{timestamp}_{safe_name}"
-    saved_path = os.path.join(RECORDINGS_DIR, filename)
-    audio_file.save(saved_path)
+        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S_%f")
+        filename = f"{timestamp}_{safe_name}"
+        saved_path = os.path.join(RECORDINGS_DIR, filename)
+        audio_file.save(saved_path)
 
-    transcript = transcribe_wav_file(saved_path)
-    structured_data = structure_medical_text(transcript)
+        transcript = transcribe_wav_file(saved_path)
+        medical_check = check_if_medical_text(transcript)
+        is_medical_text = medical_check.get("is_medical_text", False)
+        medical_message = medical_check.get("message", "")
 
-    return jsonify({
-        "transcript": transcript,
-        "structured_data": structured_data,
-        "saved_file": os.path.relpath(
-            saved_path,
-            start=os.path.abspath(
-                os.path.join(os.path.dirname(__file__), "..")
+        if not is_medical_text:
+            return jsonify({
+                "transcript": transcript,
+                "is_medical_text": False,
+                "message": medical_message or "This is not a medical text.",
+                "saved_file": os.path.relpath(
+                    saved_path,
+                    start=os.path.abspath(
+                        os.path.join(os.path.dirname(__file__), "..")
+                    )
+                )
+            })
+
+        structured_data = structure_medical_text(transcript)
+
+        return jsonify({
+            "transcript": transcript,
+            "is_medical_text": True,
+            "message": medical_message or "Medical text detected.",
+            "structured_data": structured_data,
+            "saved_file": os.path.relpath(
+                saved_path,
+                start=os.path.abspath(
+                    os.path.join(os.path.dirname(__file__), "..")
+                )
             )
-        )
-    })
+        })
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 500
 
 
 if __name__ == "__main__":
