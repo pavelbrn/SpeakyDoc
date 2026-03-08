@@ -4,6 +4,7 @@ from werkzeug.utils import secure_filename
 from datetime import datetime
 from pathlib import Path
 import sys
+import os
 
 # Ensure project root is on sys.path when this file is run directly in VS Code.
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
@@ -11,8 +12,7 @@ if str(BACKEND_ROOT) not in sys.path:
     sys.path.insert(0, str(BACKEND_ROOT))
 
 from app.whisper_service import transcribe_wav_file
-
-import os
+from app.openai_service import structure_medical_text
 
 app = Flask(__name__)
 CORS(app)
@@ -30,7 +30,6 @@ def health():
 
 @app.route("/api/process", methods=["POST"])
 def process():
-
     if "audio" not in request.files:
         return {"error": "no audio uploaded"}, 400
 
@@ -46,13 +45,17 @@ def process():
     audio_file.save(saved_path)
 
     transcript = transcribe_wav_file(saved_path)
+    structured_data = structure_medical_text(transcript)
 
     return jsonify({
         "transcript": transcript,
-        "patient_name": "PATIENT_NAME",
-        "chief_complaint": "Brustschmerzen seit 2 Tagen",
-        "assessment": "Verdacht auf Angina pectoris",
-        "saved_file": os.path.relpath(saved_path, start=os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+        "structured_data": structured_data,
+        "saved_file": os.path.relpath(
+            saved_path,
+            start=os.path.abspath(
+                os.path.join(os.path.dirname(__file__), "..")
+            )
+        )
     })
 
 
