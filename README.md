@@ -3,7 +3,7 @@
 SpeakyDoc is a small full-stack app that uploads an audio file, sends it to a Flask backend, and returns structured JSON in a SvelteKit web app. The AI will only accept medical history notes and will reject any other types of transcripts.
 
 ## Live Test
-The webapp is currently online and running here:
+The webapp is currently online and running live on a Google Coloud Run container:
 https://speaky-doc-ui-232992734624.europe-west1.run.app/
 
 This webapp container has limited resources so it might take a little while to process a .wav file
@@ -83,8 +83,9 @@ Runs on http://localhost:5173
 ## SpeakyDoc UI
 - Click on "Select Wav" and select your .wav file
 - Click on "Start Transcription" after selecting the .wav
+- 
 - Alternatively you can also dictate your own doctors notes. Please have your microphone ready.
-
+- The WebApp is phone friendly! So you can record using you phones microphone.
 ![SpeakyDoc Screenshot](docs/images/SpeakyDoc.png)
 
 - You can also preview the structured JSON output
