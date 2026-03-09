@@ -95,4 +95,4 @@ Runs on http://localhost:5173
 This project is designed to run locally with Docker. We can expand this project to use local models from ollama or Hugginface.
 
 You can find the backend code under backend/app folder. 
-The source code for the frint end can be found in frontend/speaky-doc-app/src
+The source code for the front end can be found in frontend/speaky-doc-app/src
