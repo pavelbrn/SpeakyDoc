@@ -6,7 +6,7 @@ SpeakyDoc is a small full-stack app that uploads an audio file, sends it to a Fl
 The webapp is currently online and running live on a Google Coloud Run container:
 https://speaky-doc-ui-232992734624.europe-west1.run.app/
 
-This webapp container has limited resources so it might take a little while to process a .wav file.
+This container has limited resources so it might take a little while to process a .wav file.
 
 If you need a sample audio file of a german medical dictation, you will find one in backend/recordings/PBZ_test_diktat.wav.
 
